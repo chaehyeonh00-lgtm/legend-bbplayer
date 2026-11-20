@@ -103,6 +103,13 @@ textarea{font-family:monospace;font-size:11px;height:90px}
 .cand{border:1.5px solid var(--ink);border-radius:10px;padding:12px;background:#fff;box-shadow:2px 2px 0 var(--ink)}
 .cand h4{margin:0 0 4px;font-family:'Black Han Sans';font-weight:400;font-size:18px}
 .note{font-size:12px;color:var(--muted)}
+.timebar{position:absolute;left:0;right:0;top:0;height:6px;background:var(--paper2);border-radius:12px 12px 0 0;overflow:hidden}
+.timebar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--red),var(--gold));transform-origin:left;animation:tb 2s linear forwards}
+@keyframes tb{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.modal.timed.paused .timebar i{animation-play-state:paused}
+.modal.timed{position:relative;padding-top:24px}
+.xbtn{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;border:1.5px solid var(--ink);background:#fff;font-size:18px;line-height:1;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:1px 1px 0 var(--ink)}
+.xbtn:hover{background:#fff1c7}
 .overlay{position:fixed;inset:0;background:rgba(15,25,35,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
 .modal{background:#fffdf7;border:2px solid var(--ink);border-radius:12px;max-width:560px;width:100%;max-height:90vh;overflow:auto;padding:20px;box-shadow:5px 5px 0 var(--ink)}
 .scoreline{background:var(--board);color:#e8f2ec;border-radius:8px;padding:12px 14px;font-family:'Oswald';letter-spacing:.3px;font-size:15px;margin:10px 0}
@@ -557,7 +564,9 @@ function playSeason(){
     S.milInfo=null;
   }
   S.year++;S.age++;S.lastRec=rec;
+  const sal0=S.con?salFmt(S.con):'',team0=S.team;
   genOffseason();
+  if(S.con&&S.team===team0&&salFmt(S.con)!==sal0&&sal0)rec.salChange=`${sal0} → ${salFmt(S.con)}`;
   save();
   showSeasonModal(rec,ov0);
 }
@@ -997,18 +1006,28 @@ function showSeasonModal(rec,ov0){
   const d=rec.after-ov0;
   const l=rec.line;
   const extra=l&&!POS[S.pos].p&&l.PA>=5?` · ${l.G}경기 ${l.PA}타석`:l&&POS[S.pos].p&&l.IP?` · ${l.G}경기${l.GS?` (선발 ${l.GS})`:''}`:'';
-  document.getElementById('layer').innerHTML=`<div class="overlay"><div class="modal">
+  render(); // 뒤 화면을 먼저 갱신
+  document.getElementById('layer').innerHTML=`<div class="overlay" data-ov><div class="modal timed">
+    <div class="timebar"><i></i></div>
+    <button class="xbtn" data-close aria-label="닫기">×</button>
     <div class="ev-kicker">${rec.year} SEASON RESULT</div>
     <div class="ev-title">${esc(rec.team)} · ${roleLabel(rec.role)}</div>
     <div class="note">${LG[rec.playLg].n}${rec.team_r&&rec.team_r!=='2군'?` · 팀 성적: ${rec.team_r}`:''}</div>
-    <div class="scoreline">${lineText(rec)}${extra}<br>${l&&l.field?`<br>${fieldText(l.field)}`:''}<br>WAR <b>${l?l.war:0}</b>${rec.pay?` · 올해 수령액 <b>${wonFmt(rec.pay)}</b>`:''}</div>
+    <div class="scoreline">${lineText(rec)}${extra}${l&&l.field?`<br>${fieldText(l.field)}`:''}<br>WAR <b>${l?l.war:0}</b>${rec.pay?` · 올해 수령액 <b>${wonFmt(rec.pay)}</b>`:''}</div>
     ${rec.awards.length?`<div>${rec.awards.map(a=>`<span class="award">🏆 ${esc(a)}</span>`).join('')}</div>`:''}
     ${rec.notes.length?`<p class="note">${rec.notes.map(esc).join(' · ')}</p>`:''}
     <div class="split" style="margin-top:12px"><div><div class="note">종합 능력치</div><div class="delta">${ov0} → ${rec.after} <span class="${d>=0?'up':'dn'}">${d>=0?'+':''}${d}</span></div></div>
     <div><div class="note">명성</div><div class="delta">${Math.round(S.fame)}</div></div></div>
-    <div style="margin-top:16px"><button class="btn primary big" data-close>오프시즌으로 →</button></div>
+    ${rec.salChange?`<p class="note" style="margin:10px 0 0">💰 연봉 협상: ${rec.salChange}</p>`:''}
+    <p class="note" style="margin:10px 0 0">마우스를 올려 두면 잠시 멈춰요 · 지난 기록은 '시즌 기록' 탭에서 다시 볼 수 있어요</p>
   </div></div>`;
-  document.querySelector('[data-close]').onclick=()=>{document.getElementById('layer').innerHTML='';render();};
+  const lay=document.getElementById('layer'),close=()=>{lay.innerHTML='';};
+  lay.querySelector('[data-close]').onclick=close;
+  lay.querySelector('.timebar i').addEventListener('animationend',close);
+  lay.querySelector('[data-ov]').addEventListener('click',e=>{if(e.target.hasAttribute('data-ov'))close();});
+  const md=lay.querySelector('.modal.timed'); // 실제로 마우스를 움직여 올렸을 때만 일시정지
+  md.addEventListener('mousemove',()=>md.classList.add('paused'));
+  md.addEventListener('mouseleave',()=>md.classList.remove('paused'));
 }
 function confirmModal(title,desc,ok,cb){
   document.getElementById('layer').innerHTML=`<div class="overlay"><div class="modal"><div class="ev-title">${title}</div><p class="ev-desc">${desc}</p><div class="row"><button class="btn primary" id="cok">${ok}</button><button class="btn" id="cno">취소</button></div></div></div>`;
