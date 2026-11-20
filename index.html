@@ -105,7 +105,7 @@ textarea{font-family:monospace;font-size:11px;height:90px}
 .note{font-size:12px;color:var(--muted)}
 .timebar{position:absolute;left:0;right:0;top:0;height:6px;background:var(--paper2);border-radius:12px 12px 0 0;overflow:hidden}
 .timebar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--red),var(--gold));transform-origin:left;animation:tb 2s linear forwards}
-@keyframes tb{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+@keyframes tb{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 .modal.timed.paused .timebar i{animation-play-state:paused}
 .modal.timed{position:relative;padding-top:24px}
 .xbtn{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;border:1.5px solid var(--ink);background:#fff;font-size:18px;line-height:1;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:1px 1px 0 var(--ink)}
