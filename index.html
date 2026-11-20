@@ -14,7 +14,7 @@
 <meta property="og:image" content="https://bench-to-hof.vercel.app/social-preview.png?v=1">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="최고의 야구선수가 되어라! — 고교 벤치에서 명예의 전당까지 성장하는 도트 야구선수">
+<meta property="og:image:alt" content="최고의 야구선수가 되어라! — 밤 야구장에서 홈런을 치는 도트 야구선수">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="최고의 야구선수가 되어라! : 야구선수 키우기 시뮬레이션">
 <meta name="twitter:description" content="고교 벤치 멤버에서 프로 데뷔, 주전, 국가대표, 그리고 명예의 전당까지. 시즌마다 쌓이는 기록과 선택으로 완성하는 야구 커리어 게임.">
@@ -368,8 +368,8 @@ const LG={
   ARMY:{n:'현역 복무',s:'현역',L:0,G:0}
 };
 const T={
-  KBO:['LG 트윈스','KIA 타이거즈','삼성 라이온즈','두산 베어스','KT 위즈','SSG 랜더스','롯데 자이언츠','한화 이글스','NC 다이노스','키움 히어로즈'],
-  NPB:['요미우리 자이언츠','한신 타이거스','소프트뱅크 호크스','오릭스 버펄로스','요코하마 DeNA','주니치 드래건스','히로시마 카프','라쿠텐 골든이글스','세이부 라이온스','니혼햄 파이터스','지바 롯데 마린스','야쿠르트 스왈로스'],
+  KBO:['서울 트윈스','광주 타이거즈','대구 라이온즈','서울 베어스','수원 위즈','인천 랜더스','부산 자이언츠','대전 이글스','창원 다이노스','서울 히어로즈'],
+  NPB:['도쿄 자이언츠','오사카 타이거스','후쿠오카 호크스','오사카 버펄로스','요코하마 베이스타즈','나고야 드래건스','히로시마 카프','센다이 골든이글스','사이타마 라이온스','홋카이도 파이터스','지바 마린스','도쿄 스왈로스'],
   MLB:['LA 다저스','뉴욕 양키스','샌디에이고 파드리스','샌프란시스코 자이언츠','보스턴 레드삭스','시카고 컵스','애틀랜타 브레이브스','필라델피아 필리스','휴스턴 애스트로스','텍사스 레인저스','시애틀 매리너스','토론토 블루제이스','뉴욕 메츠','탬파베이 레이스','피츠버그 파이리츠','디트로이트 타이거스','볼티모어 오리올스','클리블랜드 가디언스','밀워키 브루어스','애리조나 다이아몬드백스','미네소타 트윈스','캔자스시티 로열스','신시내티 레즈','세인트루이스 카디널스','애슬레틱스','LA 에인절스','콜로라도 로키스','마이애미 말린스','워싱턴 내셔널스','시카고 화이트삭스'],
   HS:['덕수고','서울고','휘문고','장충고','충암고','유신고','인천고','북일고','대전고','경북고','대구상원고','광주제일고','부산고','경남고','마산용마고','강릉고'],
   UNIV:['연세대','고려대','성균관대','동국대','한양대','경희대','단국대','인하대'],
@@ -381,12 +381,14 @@ const SAVE_KEY='b2h_save_v1', RANK_KEY='b2h_rank_v1';
 /* ================= 상태 ================= */
 let S=null, UI={tab:'news'};
 function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}}
-function load(){try{const t=localStorage.getItem(SAVE_KEY);const o=t?JSON.parse(t):null;if(o&&o.stats)delete o.stats.men;return o;}catch(e){return null;}}
+const TEAM_RENAME={"LG 트윈스": "서울 트윈스", "KIA 타이거즈": "광주 타이거즈", "삼성 라이온즈": "대구 라이온즈", "두산 베어스": "서울 베어스", "KT 위즈": "수원 위즈", "SSG 랜더스": "인천 랜더스", "롯데 자이언츠": "부산 자이언츠", "한화 이글스": "대전 이글스", "NC 다이노스": "창원 다이노스", "키움 히어로즈": "서울 히어로즈", "요미우리 자이언츠": "도쿄 자이언츠", "한신 타이거스": "오사카 타이거스", "소프트뱅크 호크스": "후쿠오카 호크스", "오릭스 버펄로스": "오사카 버펄로스", "요코하마 DeNA": "요코하마 베이스타즈", "주니치 드래건스": "나고야 드래건스", "라쿠텐 골든이글스": "센다이 골든이글스", "세이부 라이온스": "사이타마 라이온스", "니혼햄 파이터스": "홋카이도 파이터스", "지바 롯데 마린스": "지바 마린스", "야쿠르트 스왈로스": "도쿄 스왈로스"};
+function renameTeams(t){if(!t)return t;for(const k in TEAM_RENAME)t=t.split(k).join(TEAM_RENAME[k]);return t;}
+function load(){try{const t=renameTeams(localStorage.getItem(SAVE_KEY));const o=t?JSON.parse(t):null;if(o&&o.stats)delete o.stats.men;return o;}catch(e){return null;}}
 function keys(){return POS[S.pos].p?PIT:BAT;}
 function ovrOf(st,pos){const w=POS[pos].w;let a=0,b=0;for(const k in w){a+=w[k]*st[k];b+=w[k];}return Math.round(a/b);}
 function ovr(){return ovrOf(S.stats,S.pos);}
 /* ===== 기사 제목 생성: 시즌 기록·사건을 보고 실제 스포츠 기사 제목처럼 3개를 만든다 ===== */
-function tShort(t){if(!t)return '';if(t.includes('상무'))return '상무';if(T.MLB.includes(t))return t.split(' ').slice(-1)[0];if(T.KBO.includes(t)||T.NPB.includes(t))return t.split(' ')[0];return t.replace(/\(.*\)/,'').trim();}
+function tShort(t){if(!t)return '';if(t.includes('상무'))return '상무';if(T.MLB.includes(t))return t.split(' ').slice(-1)[0];if(T.KBO.includes(t)||T.NPB.includes(t))return t.split(' ').slice(-1)[0];return t.replace(/\(.*\)/,'').trim();}
 function headlines(rec){
   const N=S.name,T0=tShort(rec.team),l=rec.line,p=POS[S.pos].p,sp=S.pos==='SP',aw=rec.awards||[],rk=rec.ranks||{},top=topLg(rec.playLg),lgS=LG[rec.playLg]?LG[rec.playLg].s:'',pn=POS[S.pos].n,age=rec.age;
   const NT=`${T0} ${N}`,c=[];
@@ -558,7 +560,7 @@ const SCOUT={
 
 /* ================= 픽셀 프로필 =================
    20×20 도트. 모자·유니폼은 소속팀 색, 피부·머리색은 선수마다 고정, 체형에 따라 어깨 폭, 나이 들면 수염·흰머리, 은퇴하면 정장 */
-const TEAM_COLOR={'LG 트윈스':'#a50034','KIA 타이거즈':'#d6111e','삼성 라이온즈':'#074ca1','두산 베어스':'#131230','KT 위즈':'#1c1c1c','SSG 랜더스':'#ce0e2d','롯데 자이언츠':'#041e42','한화 이글스':'#f37321','NC 다이노스':'#315288','키움 히어로즈':'#820024','국군체육부대(상무)':'#4b5d2e','현역 복무':'#556b2f'};
+const TEAM_COLOR={'서울 트윈스':'#a50034','광주 타이거즈':'#d6111e','대구 라이온즈':'#074ca1','서울 베어스':'#131230','수원 위즈':'#1c1c1c','인천 랜더스':'#ce0e2d','부산 자이언츠':'#041e42','대전 이글스':'#f37321','창원 다이노스':'#315288','서울 히어로즈':'#820024','국군체육부대(상무)':'#4b5d2e','현역 복무':'#556b2f'};
 const ALT_COLOR=['#1f4e8c','#b3261e','#1d6b45','#5b2d8c','#c2410c','#0f766e','#7c2d12','#334155','#0e3a5c','#8a1c3a'];
 function hashStr(t){let h=2166136261;for(const ch of String(t))h=Math.imul(h^ch.charCodeAt(0),16777619);return h>>>0;}
 function teamColor(t){return TEAM_COLOR[t]||ALT_COLOR[hashStr(t)%ALT_COLOR.length];}
@@ -1357,7 +1359,7 @@ function doRetire(){
   // 로컬 랭킹
   if(S.seasons.some(r=>topLg(r.playLg))){
     try{
-      const arr=JSON.parse(localStorage.getItem(RANK_KEY)||'[]');
+      const arr=JSON.parse(renameTeams(localStorage.getItem(RANK_KEY))||'[]');
       arr.push({name:S.name,pos:S.pos,mvp,peak:S.peak,awards:S.awards.length,war:+war.toFixed(1),score:+score.toFixed(1),tier,team:S.team,yrs:S.seasons.length,date:new Date().toISOString().slice(0,10)});
       localStorage.setItem(RANK_KEY,JSON.stringify(arr.slice(-200)));
     }catch(e){}
@@ -1365,7 +1367,7 @@ function doRetire(){
   save();render();
 }
 function rankList(){
-  let arr=[];try{arr=JSON.parse(localStorage.getItem(RANK_KEY)||'[]');}catch(e){}
+  let arr=[];try{arr=JSON.parse(renameTeams(localStorage.getItem(RANK_KEY))||'[]');}catch(e){}
   return arr.sort((a,b)=>b.mvp-a.mvp||b.peak-a.peak||b.awards-a.awards||b.war-a.war);
 }
 
