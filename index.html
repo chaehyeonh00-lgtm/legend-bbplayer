@@ -167,9 +167,11 @@ textarea{font-family:monospace;font-size:11px;height:90px}
 .mtags{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 4px}
 .mtags span{background:#8a8d93;color:#fff;font-size:13px;font-weight:600;padding:1px 6px;border-radius:2px;line-height:1.4;white-space:nowrap}
 @media(max-width:600px){.actrow{gap:6px!important;flex-wrap:nowrap!important}.actrow .btn{padding:8px 10px;font-size:13px;white-space:nowrap}.actrow .btn .ic{width:14px;height:14px}}
-.autobar{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:12px;background:var(--ink);color:#fff;padding:8px 8px 8px 16px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:14px;font-weight:600}
+.note,.ev-desc,.choice span{word-break:keep-all;letter-spacing:-.025em}
+@media(max-width:600px){.note,.ev-desc{text-align:justify;text-wrap:wrap!important;word-break:break-all;line-break:strict}}
+.autobar{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:12px;background:var(--ink);color:#fff;padding:8px 8px 8px 16px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:14px;font-weight:600}
 .autobar span{display:flex;align-items:center;gap:8px}.autobar .dot{width:8px;height:8px;border-radius:50%;background:#4ade80;animation:pulse 1s ease-in-out infinite alternate}
-.autobar .btn{background:#fff;color:var(--ink);padding:6px 14px;font-size:13px;min-height:0}
+.autobar .btn{background:#fff;color:var(--ink);padding:6px 14px;font-size:13px;min-height:0;border-radius:999px}
 @keyframes pulse{from{opacity:.35}to{opacity:1}}
 .toast{bottom:76px!important;line-height:1.5;text-align:center;position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;z-index:60;max-width:90vw}
 
@@ -378,14 +380,14 @@ const SAVE_KEY='b2h_save_v1', RANK_KEY='b2h_rank_v1';
 /* ================= 상태 ================= */
 let S=null, UI={tab:'news'};
 function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}}
-const TEAM_RENAME={"LG 트윈스": "서울 트윈스", "KIA 타이거즈": "광주 타이거즈", "삼성 라이온즈": "대구 라이온즈", "두산 베어스": "서울 베어스", "KT 위즈": "수원 위즈", "SSG 랜더스": "인천 랜더스", "롯데 자이언츠": "부산 자이언츠", "한화 이글스": "대전 이글스", "NC 다이노스": "창원 다이노스", "키움 히어로즈": "서울 히어로즈", "요미우리 자이언츠": "도쿄 자이언츠", "한신 타이거스": "오사카 타이거스", "소프트뱅크 호크스": "후쿠오카 호크스", "오릭스 버펄로스": "오사카 버펄로스", "요코하마 DeNA": "요코하마 베이스타즈", "주니치 드래건스": "나고야 드래건스", "라쿠텐 골든이글스": "센다이 골든이글스", "세이부 라이온스": "사이타마 라이온스", "니혼햄 파이터스": "홋카이도 파이터스", "지바 롯데 마린스": "지바 마린스", "야쿠르트 스왈로스": "도쿄 스왈로스"};
+const TEAM_RENAME={"국군체육부대(상무)": "국군체육부대", "LG 트윈스": "서울 트윈스", "KIA 타이거즈": "광주 타이거즈", "삼성 라이온즈": "대구 라이온즈", "두산 베어스": "서울 베어스", "KT 위즈": "수원 위즈", "SSG 랜더스": "인천 랜더스", "롯데 자이언츠": "부산 자이언츠", "한화 이글스": "대전 이글스", "NC 다이노스": "창원 다이노스", "키움 히어로즈": "서울 히어로즈", "요미우리 자이언츠": "도쿄 자이언츠", "한신 타이거스": "오사카 타이거스", "소프트뱅크 호크스": "후쿠오카 호크스", "오릭스 버펄로스": "오사카 버펄로스", "요코하마 DeNA": "요코하마 베이스타즈", "주니치 드래건스": "나고야 드래건스", "라쿠텐 골든이글스": "센다이 골든이글스", "세이부 라이온스": "사이타마 라이온스", "니혼햄 파이터스": "홋카이도 파이터스", "지바 롯데 마린스": "지바 마린스", "야쿠르트 스왈로스": "도쿄 스왈로스"};
 function renameTeams(t){if(!t)return t;for(const k in TEAM_RENAME)t=t.split(k).join(TEAM_RENAME[k]);return t;}
 function load(){try{const t=renameTeams(localStorage.getItem(SAVE_KEY));const o=t?JSON.parse(t):null;if(o&&o.stats)delete o.stats.men;return o;}catch(e){return null;}}
 function keys(){return POS[S.pos].p?PIT:BAT;}
 function ovrOf(st,pos){const w=POS[pos].w;let a=0,b=0;for(const k in w){a+=w[k]*st[k];b+=w[k];}return Math.round(a/b);}
 function ovr(){return ovrOf(S.stats,S.pos);}
 /* ===== 기사 제목 생성: 시즌 기록·사건을 보고 실제 스포츠 기사 제목처럼 3개를 만든다 ===== */
-function tShort(t){if(!t)return '';if(t.includes('상무'))return '상무';if(T.MLB.includes(t))return t.split(' ').slice(-1)[0];if(T.KBO.includes(t)||T.NPB.includes(t))return t.split(' ').slice(-1)[0];return t.replace(/\(.*\)/,'').trim();}
+function tShort(t){if(!t)return '';if(t.includes('상무')||t.includes('국군체육부대'))return '상무';if(T.MLB.includes(t))return t.split(' ').slice(-1)[0];if(T.KBO.includes(t)||T.NPB.includes(t))return t.split(' ').slice(-1)[0];return t.replace(/\(.*\)/,'').trim();}
 function headlines(rec){
   const N=S.name,T0=tShort(rec.team),l=rec.line,p=POS[S.pos].p,sp=S.pos==='SP',aw=rec.awards||[],rk=rec.ranks||{},top=topLg(rec.playLg),lgS=LG[rec.playLg]?LG[rec.playLg].s:'',pn=POS[S.pos].n,age=rec.age;
   const NT=`${T0} ${N}`,c=[];
@@ -557,7 +559,7 @@ const SCOUT={
 
 /* ================= 픽셀 프로필 =================
    20×20 도트. 모자·유니폼은 소속팀 색, 피부·머리색은 선수마다 고정, 체형에 따라 어깨 폭, 나이 들면 수염·흰머리, 은퇴하면 정장 */
-const TEAM_COLOR={'서울 트윈스':'#a50034','광주 타이거즈':'#d6111e','대구 라이온즈':'#074ca1','서울 베어스':'#131230','수원 위즈':'#1c1c1c','인천 랜더스':'#ce0e2d','부산 자이언츠':'#041e42','대전 이글스':'#f37321','창원 다이노스':'#315288','서울 히어로즈':'#820024','국군체육부대(상무)':'#4b5d2e','현역 복무':'#556b2f'};
+const TEAM_COLOR={'서울 트윈스':'#a50034','광주 타이거즈':'#d6111e','대구 라이온즈':'#074ca1','서울 베어스':'#131230','수원 위즈':'#1c1c1c','인천 랜더스':'#ce0e2d','부산 자이언츠':'#041e42','대전 이글스':'#f37321','창원 다이노스':'#315288','서울 히어로즈':'#820024','국군체육부대':'#4b5d2e','현역 복무':'#556b2f'};
 const ALT_COLOR=['#1f4e8c','#b3261e','#1d6b45','#5b2d8c','#c2410c','#0f766e','#7c2d12','#334155','#0e3a5c','#8a1c3a'];
 function hashStr(t){let h=2166136261;for(const ch of String(t))h=Math.imul(h^ch.charCodeAt(0),16777619);return h>>>0;}
 function teamColor(t){return TEAM_COLOR[t]||ALT_COLOR[hashStr(t)%ALT_COLOR.length];}
@@ -1228,7 +1230,7 @@ const ACT={
 };
 function enlist(type){
   const keep=S.lg==='KBO'?{team:S.team,con:S.con}:null;
-  S.milInfo=keep;S.lg=type;S.team=type==='MIL'?'국군체육부대(상무)':'현역 복무';
+  S.milInfo=keep;S.lg=type;S.team=type==='MIL'?'국군체육부대':'현역 복무';
   // 같은 오프시즌의 계약·트레이드 이벤트 제거
   S.queue=S.queue.filter(e=>!['FA','TRADE','POST','CAP'].includes(e.k));
   news(type==='MIL'?'🪖 상무 합격! 퓨처스리그에서 뛰며 복무한다.':'🪖 현역 입대. 1년간 그라운드를 떠난다.');
@@ -1631,18 +1633,15 @@ function renderCreate(){
   const bad=lefty&&['C','2B','3B','SS'].includes(CF.pos);
   $app().innerHTML=`<div class="card">
     <h2>선수 만들기</h2>
-    <p class="note">고등학교 1학년, 아직은 벤치 멤버. 시즌을 진행하며 훈련·진로·계약을 선택하고, 드래프트와 병역, 해외 진출을 거쳐 명예의 전당을 노리세요. 실명 대신 닉네임을 추천해요.</p>
+    <p class="note">아직은 아마추어인 고등학교 1학년. 시즌을 진행하며 훈련·진로·계약을 선택하고, 드래프트와 병역, 해외 진출을 거쳐 레전드가 되어 보세요! 실명 대신 닉네임을 추천합니다.</p>
     <div class="split">
       <div class="field"><label>이름</label><input type="text" id="fname" maxlength="12" placeholder="예: 홍길동" value="${esc(CF.name)}"></div>
       <div class="field"><label>고등학교</label><select id="fhs">${T.HS.map(h=>`<option ${h===CF.hs?'selected':''}>${h}</option>`).join('')}</select></div>
       <div class="field"><label>포지션</label><select id="fpos">${Object.entries(POS).map(([k,v])=>`<option value="${k}" ${k===CF.pos?'selected':''}>${v.n}</option>`).join('')}</select></div>
       <div class="field"><label>투타</label><select id="fhand">${['우투우타','우투좌타','좌투좌타','좌투우타'].map(h=>`<option ${h===CF.hand?'selected':''}>${h}</option>`).join('')}</select></div>
     </div>
-    <div class="field"><label>체형</label><div class="chips">${[['slim','슬림 (주루·제구↑ 파워↓)'],['std','표준'],['power','파워 (파워·구속↑, 부상 위험↑)']].map(([k,n])=>`<button class="chip ${CF.body===k?'on':''}" data-body="${k}">${n}</button>`).join('')}</div></div>
-    <div class="split">
-      <div class="field"><label>등번호 (0~99)</label><input type="number" id="fnum" min="0" max="99" value="${CF.num}"></div>
-      <div class="field"><label>&nbsp;</label><p class="note" style="margin:6px 0 0">키·몸무게는 후보마다 체형에 맞게 무작위로 정해져요. 무거울수록 파워·구위, 가벼울수록 주루가 좋고, 키가 크면 투수는 구속·타자는 파워와 어깨가 조금 올라가요.</p></div>
-    </div>
+    <div class="field"><label>체형</label><div class="chips">${[['slim','슬림 (주루·제구↑ 파워↓)'],['std','표준'],['power','파워 (파워·구속↑, 부상 위험↑)']].map(([k,n])=>`<button class="chip ${CF.body===k?'on':''}" data-body="${k}">${n}</button>`).join('')}</div><p class="note" style="margin:8px 0 0">키·몸무게는 후보마다 체형에 맞게 무작위로 정해져요. 무거울수록 파워·구위, 가벼울수록 주루가 좋고, 키가 크면 투수는 구속·타자는 파워와 어깨가 조금 올라가요.</p></div>
+    <div class="field" style="max-width:240px"><label>등번호 (0~99)</label><input type="number" id="fnum" min="0" max="99" value="${CF.num}"></div>
     ${bad?'<p class="note" style="color:var(--red)">좌투는 포수·2루수·3루수·유격수를 맡기 어려워요. 포지션이나 투타를 바꿔 주세요.</p>':''}
     <p class="note">국적: 대한민국 (병역 의무 적용)</p>
     <button class="btn primary" id="fgo" ${bad?'disabled':''}>선수 3명 보기</button>
