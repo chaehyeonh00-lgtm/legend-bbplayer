@@ -5,10 +5,10 @@ const out='dist';fs.rmSync(out,{recursive:true,force:true});fs.mkdirSync(out);
 let html=fs.readFileSync('index.html','utf8');
 // 스크립트 난독화
 html=html.replace(/<script>([\s\S]*?)<\/script>/g,(m,code)=>{
-  const r=JO.obfuscate(code,{compact:true,identifierNamesGenerator:'hexadecimal',renameGlobals:false,
-    stringArray:true,stringArrayEncoding:['base64'],stringArrayThreshold:.75,stringArrayRotate:true,stringArrayShuffle:true,
-    splitStrings:false,controlFlowFlattening:false,deadCodeInjection:false,selfDefending:false,
-    unicodeEscapeSequence:false,transformObjectKeys:false,numbersToExpressions:false});
+  const r=JO.obfuscate(code,{compact:true,identifierNamesGenerator:'hexadecimal',renameGlobals:true,
+    stringArray:true,stringArrayEncoding:['base64'],stringArrayThreshold:1,stringArrayRotate:true,stringArrayShuffle:true,
+    splitStrings:true,splitStringsChunkLength:6,controlFlowFlattening:false,deadCodeInjection:false,selfDefending:false,
+    unicodeEscapeSequence:false,transformObjectKeys:false,numbersToExpressions:false,stringArrayWrappersCount:2,stringArrayWrappersType:'function'});
   return '<script>'+r.getObfuscatedCode()+'</script>';
 });
 // CSS 압축 + 주석 제거
